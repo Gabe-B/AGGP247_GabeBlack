@@ -41,9 +41,14 @@ public class Grid_2D : MonoBehaviour
     {
         temp = ScreenToGrid(new Vector3(0, 0, 0));
         int count = 0;
-        
-		#region Line drawing
-		while (temp.x >= 0)
+
+        if (isDrawingOrigin)
+        {
+            DrawOrigin();
+        }
+
+        #region Line drawing
+        while (temp.x >= 0)
 		{
             if (count % grid.divisionCount == 0 && count != 0)
             {
@@ -118,18 +123,14 @@ public class Grid_2D : MonoBehaviour
         }
         #endregion
 
-        if(isDrawingOrigin)
-		{
-            DrawOrigin();
-        }
-
         if (isDrawingAxis)
         {
-            DrawLine(new Line(GridToScreen(new Vector3(-grid.screenSize.x, 0, 0)), GridToScreen(new Vector3(grid.screenSize.x, 0, 0)), axisColor));
-            DrawLine(new Line(GridToScreen(new Vector3(0, -grid.screenSize.y, 0)), GridToScreen(new Vector3(0, grid.screenSize.y, 0)), axisColor));
+            DrawLine(new Line(GridToScreen(new Vector3(-grid.screenSize.x * 2, 0, 0)), GridToScreen(new Vector3(grid.screenSize.x * 2, 0, 0)), axisColor));
+            DrawLine(new Line(GridToScreen(new Vector3(0, -grid.screenSize.y * 2, 0)), GridToScreen(new Vector3(0, grid.screenSize.y * 2, 0)), axisColor));
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+		#region Keyboard/Mouse Controls
+		if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             if (isDrawingOrigin)
             {
@@ -196,15 +197,21 @@ public class Grid_2D : MonoBehaviour
 		{
             if (Input.mouseScrollDelta.y > 0)
             {
-                grid.gridSize += 1;
+                grid.gridSize += 0.2f;
             }
             else if (Input.mouseScrollDelta.y < 0)
             {
-                grid.gridSize -= 1;
+                grid.gridSize -= 0.2f;
             }
 
             Debug.Log("Grid size: " + grid.gridSize);
         }
+
+        if(Input.GetMouseButton(2))
+		{
+            grid.origin = Input.mousePosition;
+		}
+		#endregion
 	}
 
 	//Takes the potential grid space and outputs it into screen space
