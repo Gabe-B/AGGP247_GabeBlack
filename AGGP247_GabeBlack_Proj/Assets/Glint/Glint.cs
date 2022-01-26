@@ -23,7 +23,7 @@ public class Glint : MonoBehaviour
 			return;
 		}
 
-		mat = new Material(Shader.Find("Custom/VertexColor"));
+		mat = new Material(Shader.Find("Hidden/Internal-Colored"));
 	}
 
 	private void OnPostRender()
