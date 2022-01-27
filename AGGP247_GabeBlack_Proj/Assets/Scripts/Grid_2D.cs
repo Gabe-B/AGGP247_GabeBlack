@@ -28,6 +28,7 @@ public class Grid_2D : MonoBehaviour
     public Vector3 gridSize;
 
     Grid2D grid = new Grid2D();
+    DrawingTools dt = new DrawingTools();
 
     Vector3 temp;
 
@@ -240,4 +241,24 @@ public class Grid_2D : MonoBehaviour
         DrawLine(new Line(GridToScreen(new Vector3(grid.originSize, 0, 0)), GridToScreen(new Vector3(0, -grid.originSize, 0)), lineColor));
         DrawLine(new Line(GridToScreen(new Vector3(0, -grid.originSize, 0)), GridToScreen(new Vector3(-grid.originSize, 0, 0)), lineColor));
     }
+
+    public void DrawLine(Line line, bool DrawOnGrid = true)
+	{
+
+	}
+
+    /*public void DrawObject(DrawingObject lineObj, bool DrawOnGrid = true)
+	{
+
+	}
+
+    public float ScaleGrid2Screen(float value)
+    {
+        return (value * GridSize);
+    }
+
+    public float ScaleScreen2Grid(float value)
+    {
+        return (value / GridSize);
+    }*/
 }
