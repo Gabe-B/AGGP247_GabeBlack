@@ -28,5 +28,7 @@ namespace Drawing.Glint
 	public interface ICommandInstruction
 	{
 		GLCommand ToCommand();
+		void Draw(Grid_2D.Grid2D grid = null);
+
 	}
 }

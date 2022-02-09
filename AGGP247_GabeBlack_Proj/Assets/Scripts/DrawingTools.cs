@@ -33,9 +33,15 @@ public class DrawingTools : MonoBehaviour
 
     public static Vector3 RotatePoint(Vector3 Center, float angle, Vector3 pointIN)
 	{
-        float xNew = pointIN.x * Mathf.Cos(angle) - pointIN.y * Mathf.Sin(angle);
-        float yNew = pointIN.x * Mathf.Sin(angle) + pointIN.y * Mathf.Cos(angle);
+        float radAngle = Mathf.Deg2Rad * angle;
 
-        return new Vector3(xNew, yNew, 0);
+        pointIN -= Center;
+
+        float xNew = pointIN.x * Mathf.Cos(radAngle) - pointIN.y * Mathf.Sin(radAngle);
+        float yNew = pointIN.x * Mathf.Sin(radAngle) + pointIN.y * Mathf.Cos(radAngle);
+
+        pointIN = Center + new Vector3(xNew, yNew);
+
+        return pointIN;
     }
 }
