@@ -44,4 +44,28 @@ public class DrawingTools : MonoBehaviour
 
         return pointIN;
     }
+
+    public static Vector3 CircleRadiusPoint(Vector3 Origin, float angle, float radius)
+	{
+        Vector3 returnPoint = Origin + new Vector3(radius, 0, 0);
+
+        returnPoint = RotatePoint(Origin, angle, returnPoint);
+
+        return returnPoint;
+	}
+
+    /*public static Vector3 EllipseRadiusPoint(Vector3 Origin, float angle, float radius)
+    {
+
+    }*/
+
+    public static float ToDegrees(float radians)
+	{
+        return Mathf.Rad2Deg * radians;
+	}
+
+    public static float ToRadians(float degrees)
+    {
+        return Mathf.Deg2Rad * degrees;
+    }
 }

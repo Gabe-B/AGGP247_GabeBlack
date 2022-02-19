@@ -452,6 +452,11 @@ public class Grid_2D : MonoBehaviour
 
 	}
 
+	public void DrawCircle(Vector3 pos, float radius, int sides, Color color)
+	{
+		Vector3 prevPoint = new Vector3(Mathf.Sqrt(-Mathf.Pow(pos.y, 2) + Mathf.Pow(radius, 2)), -2000);
+	}
+
 	/*
     public float ScaleGrid2Screen(float value)
     {
