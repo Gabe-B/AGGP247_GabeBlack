@@ -27,6 +27,22 @@ public class Grid_2D : MonoBehaviour
 		}
 	}
 
+	public class Ellipse
+	{
+		public Vector3 Position = Vector2.zero;
+		public Vector3 Center = Vector2.zero;
+		public Vector3 Axis = Vector2.one;
+		public float Roation = 0;
+		public int Sides = 32;
+		public float Width = 2.0f;
+		public Color color = Color.white;
+	}
+
+	public class Circle : Ellipse
+	{
+		public float radius = 10f;
+	}
+
 	public Color axisColor = Color.white;
 	public Color lineColor = Color.gray;
 	public Color divisionColor = Color.yellow;
@@ -42,27 +58,58 @@ public class Grid_2D : MonoBehaviour
 	DrawingObjects diamond = new DrawingObjects();
 	DrawingObjects hex = new DrawingObjects();
 	DrawingObjects letterP = new DrawingObjects();
+	Ellipse ellipse = new Ellipse();
+	Circle circle = new Circle();
+	Ellipse ellipse2 = new Ellipse();
+	Circle circle2 = new Circle();
+
 
 	Vector3[] verts = new Vector3[4];
 
 	Grid2D grid = new Grid2D();
 
 	Vector3 temp;
+
+	bool groupOne = true;
 	
 	float diamondRotSpeed;
 
 	public float test;
+	public int circleSides = 4;
+	public float radius = 10;
+	public int ellipseSides = 32;
 
 	private void Start()
 	{
 		grid.origin = new Vector3((Screen.width / 2), (Screen.height / 2), 0);
 		grid.screenSize = new Vector3((Screen.width), (Screen.height), 0);
+
+		ellipse.Position = new Vector3(0, 0);
+		ellipse.Axis = new Vector3(40, 10);
+		ellipse.color = Color.green;
+
+		circle.Position = new Vector3(0, 0);
+		circle.color = Color.cyan;
+
+		ellipse2.Position = new Vector3(30, 30);
+		ellipse2.Axis = new Vector3(20, 30);
+		ellipse2.color = Color.green;
+
+		circle2.Position = new Vector3(-30, -30);
+		circle2.color = Color.cyan;
 	}
 
 	private void Update()
 	{
 		temp = new Vector3(0, 0, 0);
 		int count = 0;
+		ellipse.Sides = ellipseSides;
+		circle.radius = radius;
+		circle.Sides = circleSides;
+
+		ellipse2.Sides = ellipseSides;
+		circle2.radius = radius;
+		circle2.Sides = circleSides;
 
 		if (isDrawingOrigin)
 		{
@@ -172,7 +219,31 @@ public class Grid_2D : MonoBehaviour
 		DrawParabolaThree();
 		DrawParabolaFour();
 
+		if(groupOne)
+		{
+			DrawCircle(circle.Position, circle.radius, circle.Sides, circle.color);
+			DrawElipse(ellipse.Position, ellipse.Axis, ellipse.Sides, ellipse.color);
+		}
+		else
+		{
+			DrawCircle(circle2.Position, circle2.radius, circle2.Sides, circle2.color);
+			DrawElipse(ellipse2.Position, ellipse2.Axis, ellipse2.Sides, ellipse2.color);
+		}
+		
+
 		#region Keyboard/Mouse Controls
+		if(Input.GetKeyDown(KeyCode.Tab))
+		{
+			if(groupOne)
+			{
+				groupOne = false;
+			}
+			else
+			{
+				groupOne = true;
+			}
+		}
+
 		if (Input.GetKeyDown(KeyCode.Alpha1))
 		{
 			if (isDrawingOrigin)
@@ -454,7 +525,40 @@ public class Grid_2D : MonoBehaviour
 
 	public void DrawCircle(Vector3 pos, float radius, int sides, Color color)
 	{
-		Vector3 prevPoint = new Vector3(Mathf.Sqrt(-Mathf.Pow(pos.y, 2) + Mathf.Pow(radius, 2)), -2000);
+		if (sides < 3)
+		{
+			sides = 3;
+		}
+
+		Vector3 prevPoint = DrawingTools.CircleRadiusPoint(pos, (360f/sides), radius); //new Vector3(pos.x + radius, pos.y + radius);
+
+		for(int x = 0; x <= sides; x++)
+		{
+			Vector3 nextPoint = DrawingTools.RotatePoint(pos, (360f/sides), prevPoint);
+
+			DrawLine(new Line(GridToScreen(new Vector3(prevPoint.x, prevPoint.y)), GridToScreen(new Vector3(nextPoint.x, nextPoint.y)), color));
+
+			prevPoint = nextPoint;
+		}
+	}
+
+	public void DrawElipse(Vector3 pos, Vector2 axis, int sides, Color color)
+	{
+		if (sides < 3)
+		{
+			sides = 3;
+		}
+
+		Vector3 prevPoint = DrawingTools.EllipseRadiusPoint(pos, 0, axis); //new Vector3(pos.x + axis.x, pos.y + axis.y);
+
+		for (int x = 1; x <= sides; x++)
+		{
+			Vector3 nextPoint = DrawingTools.EllipseRadiusPoint(pos, (360f / sides) * x, axis);
+
+			DrawLine(new Line(GridToScreen(new Vector3(prevPoint.x, prevPoint.y)), GridToScreen(new Vector3(nextPoint.x, nextPoint.y)), color));
+
+			prevPoint = nextPoint;
+		}
 	}
 
 	/*

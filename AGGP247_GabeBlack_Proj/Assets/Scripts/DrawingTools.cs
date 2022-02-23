@@ -33,7 +33,7 @@ public class DrawingTools : MonoBehaviour
 
     public static Vector3 RotatePoint(Vector3 Center, float angle, Vector3 pointIN)
 	{
-        float radAngle = Mathf.Deg2Rad * angle;
+        float radAngle = ToRadians(angle);
 
         pointIN -= Center;
 
@@ -54,10 +54,10 @@ public class DrawingTools : MonoBehaviour
         return returnPoint;
 	}
 
-    /*public static Vector3 EllipseRadiusPoint(Vector3 Origin, float angle, float radius)
+    public static Vector3 EllipseRadiusPoint(Vector3 Origin, float angle, Vector3 axis)
     {
-
-    }*/
+        return new Vector3(Origin.x + (axis.x * Mathf.Cos(ToRadians(angle))), Origin.y + (axis.y * Mathf.Sin(ToRadians(angle))));
+    }
 
     public static float ToDegrees(float radians)
 	{

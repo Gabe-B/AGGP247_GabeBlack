@@ -9,7 +9,7 @@ public class DrawingObjects : MonoBehaviour
     public float Roation = 0;
     public Vector3 Scale = Vector3.zero;
     public Vector3 Location = Vector3.zero;
-    public List<ICommandInstruction> Lines = new List<ICommandInstruction>();
+	public List<ICommandInstruction> Lines = new List<ICommandInstruction>();
 
     public void Start()
     {
