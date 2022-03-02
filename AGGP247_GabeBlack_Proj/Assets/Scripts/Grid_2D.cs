@@ -20,11 +20,6 @@ public class Grid_2D : MonoBehaviour
 		{
 
 		}
-
-		public void DrawObject(DrawingObjects lineObj, bool DrawOnGrid = true)
-		{
-
-		}
 	}
 
 	public class Ellipse
@@ -43,47 +38,71 @@ public class Grid_2D : MonoBehaviour
 		public float radius = 10f;
 	}
 
+	#region public variables
 	public Color axisColor = Color.white;
 	public Color lineColor = Color.gray;
 	public Color divisionColor = Color.yellow;
+
+	public Vector3 start, end, point;
 
 	public bool isDrawingOrigin = true;
 	public bool isDrawingAxis = true;
 	public bool isDrawingDivisions = true;
 
-	public Vector3 start, end;
+	public float test;
+	public float radius = 10;
+	public float filledRadius = 10;
+	public float rectWidth = 20;
+	public float rectHeight = 10;
+	public float triSize = 10;
 
-	bool diamondInit = false;
 
+	public int circleSides = 4;
+	public int ellipseSides = 32;
+	public int filledSides = 32;
+
+	public Vector3 triP1, triP2, triP3;
+	#endregion
+
+	#region Private variables
 	DrawingObjects diamond = new DrawingObjects();
 	DrawingObjects hex = new DrawingObjects();
 	DrawingObjects letterP = new DrawingObjects();
+	DrawingObjects rectangle = new DrawingObjects();
+	DrawingObjects filledRectangle = new DrawingObjects();
+	DrawingObjects tri = new DrawingObjects();
+	DrawingObjects filledTri = new DrawingObjects();
+
 	Ellipse ellipse = new Ellipse();
-	Circle circle = new Circle();
 	Ellipse ellipse2 = new Ellipse();
+
+	Circle circle = new Circle();
 	Circle circle2 = new Circle();
 
 
 	Vector3[] verts = new Vector3[4];
+	Vector3[] rectVerts = new Vector3[4];
+	Vector3 temp;
 
 	Grid2D grid = new Grid2D();
 
-	Vector3 temp;
+	bool groupOne, drawCollisions = true;
+	bool drawGraphs = false;
 
-	bool groupOne = true;
-	
 	float diamondRotSpeed;
-
-	public float test;
-	public int circleSides = 4;
-	public float radius = 10;
-	public int ellipseSides = 32;
+	float dist;
+	#endregion
 
 	private void Start()
 	{
+		triP1 = new Vector3(-20, 12);
+		triP2 = new Vector3(-40, 10);
+		triP3 = new Vector3(-25, 35);
+
 		grid.origin = new Vector3((Screen.width / 2), (Screen.height / 2), 0);
 		grid.screenSize = new Vector3((Screen.width), (Screen.height), 0);
 
+		#region ellipses and circles
 		ellipse.Position = new Vector3(0, 0);
 		ellipse.Axis = new Vector3(40, 10);
 		ellipse.color = Color.green;
@@ -97,12 +116,17 @@ public class Grid_2D : MonoBehaviour
 
 		circle2.Position = new Vector3(-30, -30);
 		circle2.color = Color.cyan;
+		#endregion
 	}
 
 	private void Update()
 	{
+		#region update variables
 		temp = new Vector3(0, 0, 0);
+		point = Input.mousePosition;
+
 		int count = 0;
+
 		ellipse.Sides = ellipseSides;
 		circle.radius = radius;
 		circle.Sides = circleSides;
@@ -110,6 +134,7 @@ public class Grid_2D : MonoBehaviour
 		ellipse2.Sides = ellipseSides;
 		circle2.radius = radius;
 		circle2.Sides = circleSides;
+		#endregion
 
 		if (isDrawingOrigin)
 		{
@@ -211,30 +236,66 @@ public class Grid_2D : MonoBehaviour
 			DrawLine(new Line(GridToScreen(new Vector3(0, -grid.screenSize.y * 2, 0)), GridToScreen(new Vector3(0, grid.screenSize.y * 2, 0)), axisColor));
 		}
 
-		RotateDiamondAroundOrigin(1440);
-		DrawHexagon();
-		DrawLetterP();
-		DrawParabolaOne();
-		DrawParabolaTwo();
-		DrawParabolaThree();
-		DrawParabolaFour();
+		#region Draw Collisions
 
-		if(groupOne)
+		if (drawCollisions)
 		{
-			DrawCircle(circle.Position, circle.radius, circle.Sides, circle.color);
-			DrawElipse(ellipse.Position, ellipse.Axis, ellipse.Sides, ellipse.color);
+			if (GetDistToFilledCircle(new Vector3(20, 20), point, filledRadius))
+			{
+				DrawFilledCircle(new Vector3(20, 20), filledRadius, filledSides, Color.red);
+			}
+			else
+			{
+				DrawCircle(new Vector3(20, 20), filledRadius, filledSides, Color.blue);
+			}
+
+			DrawRectangle(new Vector3(-20, -20), rectWidth, rectHeight, Color.cyan);
+
+			if (isInsideRect(rectVerts, point))
+			{
+				DrawFilledRectangle(new Vector3(-20, -20), rectWidth, rectHeight, Color.black);
+			}
+
+			DrawTriangle(triP1, triP2, triP3, Color.green);
+			//DrawFilledCircle(triCenter(triP1, triP2, triP3), 1, 32, Color.blue);
+
+			if (isInsideTri())
+			{
+				DrawFilledTriangle(triP1, triP2, triP3, Color.white); //DID NOT GET TO WORK
+			}
 		}
-		else
+
+		#endregion
+
+		#region Draw Graphs
+		if (drawGraphs)
 		{
-			DrawCircle(circle2.Position, circle2.radius, circle2.Sides, circle2.color);
-			DrawElipse(ellipse2.Position, ellipse2.Axis, ellipse2.Sides, ellipse2.color);
+			RotateDiamondAroundOrigin(1440);
+			DrawHexagon();
+			DrawLetterP();
+			DrawParabolaOne();
+			DrawParabolaTwo();
+			DrawParabolaThree();
+			DrawParabolaFour();
+
+			if (groupOne)
+			{
+				DrawCircle(circle.Position, circle.radius, circle.Sides, circle.color);
+				DrawElipse(ellipse.Position, ellipse.Axis, ellipse.Sides, ellipse.color);
+			}
+			else
+			{
+				DrawCircle(circle2.Position, circle2.radius, circle2.Sides, circle2.color);
+				DrawElipse(ellipse2.Position, ellipse2.Axis, ellipse2.Sides, ellipse2.color);
+			}
 		}
-		
+		#endregion
 
 		#region Keyboard/Mouse Controls
-		if(Input.GetKeyDown(KeyCode.Tab))
+
+		if (Input.GetKeyDown(KeyCode.Tab))
 		{
-			if(groupOne)
+			if (groupOne)
 			{
 				groupOne = false;
 			}
@@ -280,6 +341,30 @@ public class Grid_2D : MonoBehaviour
 			}
 		}
 
+		if (Input.GetKeyDown(KeyCode.Alpha4))
+		{
+			if (drawGraphs)
+			{
+				drawGraphs = false;
+			}
+			else
+			{
+				drawGraphs = true;
+			}
+		}
+
+		if (Input.GetKeyDown(KeyCode.Alpha5))
+		{
+			if (drawCollisions)
+			{
+				drawCollisions = false;
+			}
+			else
+			{
+				drawCollisions = true;
+			}
+		}
+
 		if (Input.GetKey(KeyCode.LeftControl))
 		{
 			if (Input.mouseScrollDelta.y > 0)
@@ -304,8 +389,6 @@ public class Grid_2D : MonoBehaviour
 					grid.divisionCount -= 5;
 				}
 			}
-
-			//Debug.Log("Division count: " + grid.divisionCount);
 		}
 		else
 		{
@@ -317,14 +400,13 @@ public class Grid_2D : MonoBehaviour
 			{
 				grid.gridSize -= 1f;
 			}
-
-			//Debug.Log("Grid size: " + grid.gridSize);
 		}
 
 		if (Input.GetMouseButton(2))
 		{
 			grid.origin = Input.mousePosition;
 		}
+
 		#endregion
 	}
 
@@ -349,16 +431,6 @@ public class Grid_2D : MonoBehaviour
 	//Draws the Origin Point (or Symbol)
 	public void DrawOrigin()
 	{
-		/*DrawLine(new Line(GridToScreen(new Vector3(-grid.originSize, 0, 0)), GridToScreen(new Vector3(0, grid.originSize, 0)), lineColor));
-        DrawLine(new Line(GridToScreen(new Vector3(0, grid.originSize, 0)), GridToScreen(new Vector3(grid.originSize, 0, 0)), lineColor));
-        DrawLine(new Line(GridToScreen(new Vector3(grid.originSize, 0, 0)), GridToScreen(new Vector3(0, -grid.originSize, 0)), lineColor));
-        DrawLine(new Line(GridToScreen(new Vector3(0, -grid.originSize, 0)), GridToScreen(new Vector3(-grid.originSize, 0, 0)), lineColor));
-
-        start = DrawingTools.RotatePoint(grid.origin, 45.0f, new Vector3(-grid.originSize, 0, 0));
-        end = DrawingTools.RotatePoint(grid.origin, 45.0f, new Vector3(0, grid.originSize, 0));
-
-        DrawLine(new Line(GridToScreen(start), GridToScreen(end), lineColor));*/
-
 		verts[0] = GridToScreen(new Vector3(-grid.originSize, 0, 0));
 		verts[1] = GridToScreen(new Vector3(0, grid.originSize, 0));
 		verts[2] = GridToScreen(new Vector3(grid.originSize, 0, 0));
@@ -368,6 +440,7 @@ public class Grid_2D : MonoBehaviour
 		Glint.AddCommand(diamond);
 	}
 
+	#region Lab 1-3
 	public void RotateDiamondAroundOrigin(float time = 5.0f)
 	{
 		diamondRotSpeed = 360 / time;
@@ -375,36 +448,16 @@ public class Grid_2D : MonoBehaviour
 		Vector3 p1, p2, p3, p4 = new Vector3();
 
 		diamond.Lines.Clear();
-		
+
 		p1 = GridToScreen(new Vector3(-7.5f, 15));
 		p2 = GridToScreen(new Vector3(0, 3 * 7.5f));
 		p3 = GridToScreen(new Vector3(7.5f, 15));
 		p4 = GridToScreen(new Vector3(0, 7.5f));
 
-		//diamond.Lines.Add(new Line(p1, p2, lineColor));
-		//diamond.Lines.Add(new Line(p2, p3, lineColor));
-		//diamond.Lines.Add(new Line(p3, p4, lineColor));
-		//diamond.Lines.Add(new Line(p4, p1, lineColor));
-
-		//Debug.Log("1: " + ScreenToGrid(p1));
-		//Debug.Log("2: " + ScreenToGrid(p2));
-		//Debug.Log("3: " + ScreenToGrid(p3));
-		//Debug.Log("4: " + ScreenToGrid(p4));
-
-		//diamond.Draw();
-
-		//Debug.Log("Origin: " + grid.origin);
-
-
 		p1 = DrawingTools.RotatePoint(grid.origin, -test, p1);
 		p2 = DrawingTools.RotatePoint(grid.origin, -test, p2);
 		p3 = DrawingTools.RotatePoint(grid.origin, -test, p3);
 		p4 = DrawingTools.RotatePoint(grid.origin, -test, p4);
-
-		//Debug.Log("1 post: " + ScreenToGrid(p1));
-		//Debug.Log("2 post: " + ScreenToGrid(p2));
-		//Debug.Log("3 post: " + ScreenToGrid(p3));
-		//Debug.Log("4 post: " + ScreenToGrid(p4));
 
 		diamond.Lines.Add(new Line(p1, p2, lineColor));
 		diamond.Lines.Add(new Line(p2, p3, lineColor));
@@ -467,7 +520,7 @@ public class Grid_2D : MonoBehaviour
 	{
 		Vector3 prevPoint = new Vector3(-2000, Mathf.Pow(-2000, 2));
 
-		for(int x = -2000; x <= 2000; x++)
+		for (int x = -2000; x <= 2000; x++)
 		{
 			Vector3 nextPoint = new Vector3(x, x * x);
 
@@ -475,7 +528,7 @@ public class Grid_2D : MonoBehaviour
 
 			prevPoint = nextPoint;
 		}
-		
+
 	}
 
 	public void DrawParabolaTwo()
@@ -530,11 +583,11 @@ public class Grid_2D : MonoBehaviour
 			sides = 3;
 		}
 
-		Vector3 prevPoint = DrawingTools.CircleRadiusPoint(pos, (360f/sides), radius); //new Vector3(pos.x + radius, pos.y + radius);
+		Vector3 prevPoint = DrawingTools.CircleRadiusPoint(pos, (360f / sides), radius); //new Vector3(pos.x + radius, pos.y + radius);
 
-		for(int x = 0; x <= sides; x++)
+		for (int x = 0; x <= sides; x++)
 		{
-			Vector3 nextPoint = DrawingTools.RotatePoint(pos, (360f/sides), prevPoint);
+			Vector3 nextPoint = DrawingTools.RotatePoint(pos, (360f / sides), prevPoint);
 
 			DrawLine(new Line(GridToScreen(new Vector3(prevPoint.x, prevPoint.y)), GridToScreen(new Vector3(nextPoint.x, nextPoint.y)), color));
 
@@ -549,7 +602,7 @@ public class Grid_2D : MonoBehaviour
 			sides = 3;
 		}
 
-		Vector3 prevPoint = DrawingTools.EllipseRadiusPoint(pos, 0, axis); //new Vector3(pos.x + axis.x, pos.y + axis.y);
+		Vector3 prevPoint = DrawingTools.EllipseRadiusPoint(pos, 0, axis);
 
 		for (int x = 1; x <= sides; x++)
 		{
@@ -561,14 +614,180 @@ public class Grid_2D : MonoBehaviour
 		}
 	}
 
-	/*
-    public float ScaleGrid2Screen(float value)
-    {
-        return (value * GridSize);
-    }
+	#endregion
 
-    public float ScaleScreen2Grid(float value)
-    {
-        return (value / GridSize);
-    }*/
+	#region Collision Example
+
+	public void DrawFilledCircle(Vector3 pos, float radius, int sides, Color color)
+	{
+		if (sides < 3)
+		{
+			sides = 3;
+		}
+
+		for (float r = radius; r > 0; r -= 0.1f)
+		{
+			Vector3 prevPoint = DrawingTools.CircleRadiusPoint(pos, (360f / sides), r);
+
+			for (int x = 0; x <= sides; x++)
+			{
+				Vector3 nextPoint = DrawingTools.RotatePoint(pos, (360f / sides), prevPoint);
+
+				DrawLine(new Line(GridToScreen(new Vector3(prevPoint.x, prevPoint.y)), GridToScreen(new Vector3(nextPoint.x, nextPoint.y)), color));
+
+				prevPoint = nextPoint;
+			}
+		}
+	}
+
+	public bool GetDistToFilledCircle(Vector3 circleCenter, Vector3 point, float circleRadius)
+	{
+		dist = Vector3.Distance(circleCenter, ScreenToGrid(point));
+
+		if (dist < circleRadius)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public void DrawRectangle(Vector3 pos, float width, float height, Color color)
+	{
+		rectangle.Lines.Clear();
+
+
+		Vector3 p1, p2, p3, p4 = new Vector3();
+
+		p1 = GridToScreen(new Vector3(pos.x - (width * 0.5f), pos.y + (height * 0.5f)));
+		p2 = GridToScreen(new Vector3(pos.x + (width * 0.5f), pos.y + (height * 0.5f)));
+		p3 = GridToScreen(new Vector3(pos.x + (width * 0.5f), pos.y - (height * 0.5f)));
+		p4 = GridToScreen(new Vector3(pos.x - (width * 0.5f), pos.y - (height * 0.5f)));
+
+		rectVerts[0] = p1;
+		rectVerts[1] = p2;
+		rectVerts[2] = p3;
+		rectVerts[3] = p4;
+
+		rectangle.Lines.Add(new Line(p1, p2, color));
+		rectangle.Lines.Add(new Line(p2, p3, color));
+		rectangle.Lines.Add(new Line(p3, p4, color));
+		rectangle.Lines.Add(new Line(p4, p1, color));
+
+		rectangle.Draw();
+	}
+
+	public void DrawFilledRectangle(Vector3 pos, float width, float height, Color color)
+	{
+		while (width > 0 || height > 0)
+		{
+			filledRectangle.Lines.Clear();
+
+
+			Vector3 p1, p2, p3, p4 = new Vector3();
+
+			p1 = GridToScreen(new Vector3(pos.x - (width * 0.5f), pos.y + (height * 0.5f)));
+			p2 = GridToScreen(new Vector3(pos.x + (width * 0.5f), pos.y + (height * 0.5f)));
+			p3 = GridToScreen(new Vector3(pos.x + (width * 0.5f), pos.y - (height * 0.5f)));
+			p4 = GridToScreen(new Vector3(pos.x - (width * 0.5f), pos.y - (height * 0.5f)));
+
+			filledRectangle.Lines.Add(new Line(p1, p2, color));
+			filledRectangle.Lines.Add(new Line(p2, p3, color));
+			filledRectangle.Lines.Add(new Line(p3, p4, color));
+			filledRectangle.Lines.Add(new Line(p4, p1, color));
+
+			filledRectangle.Draw();
+
+			width -= 0.1f;
+			height -= 0.1f;
+		}
+	}
+
+	public bool isInsideRect(Vector3[] verts, Vector3 point)
+	{
+		if ((point.x >= verts[0].x && point.y <= verts[0].y) && (point.x <= verts[1].x && point.y <= verts[1].y) &&
+		   (point.x <= verts[2].x && point.y >= verts[2].y) && (point.x >= verts[3].x && point.y >= verts[3].y))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public void DrawTriangle(Vector3 p1, Vector3 p2, Vector3 p3, Color color)
+	{
+		tri.Lines.Clear();
+
+		tri.Lines.Add(new Line(GridToScreen(p1), GridToScreen(p2), color));
+		tri.Lines.Add(new Line(GridToScreen(p2), GridToScreen(p3), color));
+		tri.Lines.Add(new Line(GridToScreen(p3), GridToScreen(p1), color));
+
+		tri.Draw();
+	}
+
+	//DID NOT GET TO WORK
+	public void DrawFilledTriangle(Vector3 p1, Vector3 p2, Vector3 p3, Color color)
+	{
+		Vector3 center = triCenter(p1, p2, p3);
+
+		filledTri.Lines.Clear();
+
+		filledTri.Lines.Add(new Line(GridToScreen(p1), GridToScreen(p2), color));
+		filledTri.Lines.Add(new Line(GridToScreen(p2), GridToScreen(p3), color));
+		filledTri.Lines.Add(new Line(GridToScreen(p1), GridToScreen(p3), color));
+
+		filledTri.Draw();
+	}
+
+	public bool isInsideTri()
+	{
+		float totalArea = triArea(GridToScreen(triP1), GridToScreen(triP2), GridToScreen(triP3));
+
+		float area1 = triArea(GridToScreen(triP1), GridToScreen(triP2), point);
+		float area2 = triArea(GridToScreen(triP2), GridToScreen(triP3), point);
+		float area3 = triArea(GridToScreen(triP1), GridToScreen(triP3), point);
+
+		//Debug.Log("Total: " + totalArea);
+		//Debug.Log("Sum: " + (area1 + area2 + area3));
+
+		float sum = area1 + area2 + area3;
+
+		if (sum == totalArea)
+		{
+			return true;
+		}
+		else if (sum == totalArea + 10)
+		{
+			return true;
+		}
+		else if (sum == totalArea - 10)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public float triArea(Vector3 p1, Vector3 p2, Vector3 p3)
+	{
+		return Mathf.Abs((float)((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2.0));
+	}
+
+	public Vector3 triCenter(Vector3 p1, Vector3 p2, Vector3 p3)
+	{
+		float x = (p1.x + p2.x + p3.x) / 3f;
+		float y = (p1.y + p2.y + p3.y) / 3f;
+
+		Vector3 returnPoint = new Vector3(x, y);
+
+		return returnPoint;
+	}
+
+	#endregion
 }
