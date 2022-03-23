@@ -62,6 +62,8 @@ public class Grid_2D : MonoBehaviour
 	public int filledSides = 32;
 
 	public Vector3 triP1, triP2, triP3;
+
+	public float shipVelocity = 0;
 	#endregion
 
 	#region Private variables
@@ -72,6 +74,7 @@ public class Grid_2D : MonoBehaviour
 	DrawingObjects filledRectangle = new DrawingObjects();
 	DrawingObjects tri = new DrawingObjects();
 	DrawingObjects filledTri = new DrawingObjects();
+	DrawingObjects spaceship = new DrawingObjects();
 
 	Ellipse ellipse = new Ellipse();
 	Ellipse ellipse2 = new Ellipse();
@@ -141,7 +144,9 @@ public class Grid_2D : MonoBehaviour
 			DrawOrigin();
 		}
 
+		// Commented out for lab 5
 		#region Line drawing
+		/*
 		while (temp.x <= grid.screenSize.x)
 		{
 			if (count % grid.divisionCount == 0 && count != 0)
@@ -228,6 +233,7 @@ public class Grid_2D : MonoBehaviour
 			temp.y -= grid.gridSize * 0.2f;
 			count--;
 		}
+		*/
 		#endregion
 
 		if (isDrawingAxis)
@@ -236,8 +242,16 @@ public class Grid_2D : MonoBehaviour
 			DrawLine(new Line(GridToScreen(new Vector3(0, -grid.screenSize.y * 2, 0)), GridToScreen(new Vector3(0, grid.screenSize.y * 2, 0)), axisColor));
 		}
 
-		#region Draw Collisions
+		#region Spaceship
 
+		ControlSpaceship();
+		DrawSpaceShip(new Vector3(0, 0), Color.cyan);
+
+		#endregion
+
+		// Commented out for lab 5
+		#region Draw Collisions
+		/*
 		if (drawCollisions)
 		{
 			if (GetDistToFilledCircle(new Vector3(20, 20), point, filledRadius))
@@ -264,10 +278,12 @@ public class Grid_2D : MonoBehaviour
 				DrawFilledTriangle(triP1, triP2, triP3, Color.white); //DID NOT GET TO WORK
 			}
 		}
-
+		*/
 		#endregion
 
+		// Commented out for lab 5
 		#region Draw Graphs
+		/*
 		if (drawGraphs)
 		{
 			RotateDiamondAroundOrigin(1440);
@@ -289,6 +305,7 @@ public class Grid_2D : MonoBehaviour
 				DrawElipse(ellipse2.Position, ellipse2.Axis, ellipse2.Sides, ellipse2.color);
 			}
 		}
+		*/
 		#endregion
 
 		#region Keyboard/Mouse Controls
@@ -787,6 +804,35 @@ public class Grid_2D : MonoBehaviour
 		Vector3 returnPoint = new Vector3(x, y);
 
 		return returnPoint;
+	}
+
+	#endregion
+
+	#region Spaceship
+	
+	public void DrawSpaceShip(Vector3 center, Color color)
+	{
+		spaceship.Lines.Clear();
+
+		Vector3 p1, p2, p3 = new Vector3();
+
+		p1 = GridToScreen(new Vector3(center.x - 5f, center.y + 2f));
+		p2 = GridToScreen(new Vector3(center.x - 5f, center.y - 2f));
+		p3 = GridToScreen(new Vector3(center.x + 5f, center.y));
+
+		spaceship.Lines.Add(new Line(p1, p2, color));
+		spaceship.Lines.Add(new Line(p2, p3, color));
+		spaceship.Lines.Add(new Line(p3, p1, color));
+
+		spaceship.Draw();
+	}
+
+	public void ControlSpaceship()
+	{
+		if(Input.GetKeyDown(KeyCode.W))
+		{
+			shipVelocity += 1f;
+		}
 	}
 
 	#endregion
