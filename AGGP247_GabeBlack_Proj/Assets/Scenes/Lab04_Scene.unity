@@ -187,6 +187,7 @@ MonoBehaviour:
   triP1: {x: 0, y: 0, z: 0}
   triP2: {x: 0, y: 0, z: 0}
   triP3: {x: 0, y: 0, z: 0}
+  shipVelocity: 0
 --- !u!114 &522930823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,8 +336,9 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1815650936}
-  m_Text: Press 1, 2, or 3 for graph info toggle. Press 4 for lab 3 graphs. Press
-    5 for lab 4 graphs.
+  m_Text: "Press 1, 2, or 3 for graph info toggle. Press 4 for lab 3 graphs. Press
+    5 for lab 4 graphs. \n\t\t\t\t\t\t\t\tPress 'P' to switch between these labs
+    and lab 5"
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -399,7 +401,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1815650936}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.36, y: -3.84, z: -7.37}
+  m_LocalPosition: {x: -6.48, y: -3.68, z: -7.37}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children: []
   m_Father: {fileID: 0}
