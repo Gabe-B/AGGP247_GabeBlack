@@ -28,15 +28,23 @@ public class Lab_5 : MonoBehaviour
 	public Color divisionColor = Color.yellow;
 
 	public Vector3 point;
+	public Vector3 shipCenter;
+	public Vector3 shipVelocity;
+	public Vector3 testForce;
 
 	public bool isDrawingOrigin = true;
 	public bool isDrawingAxis = true;
 
-	public float shipVelocity = 0;
+	public float shipRotSpeed = 0.5f;
+	public float shipRotAngle;
+	public float shipMoveSpeed = 10f;
+	public float shipMass = 40f;
+	public float shipMaxMoveSpeed = 10;
 
 	DrawingObjects spaceship = new DrawingObjects();
 
 	Vector3[] verts = new Vector3[4];
+	Vector3[] shipPoints = new Vector3[3];
 
 	Grid2D grid = new Grid2D();
 
@@ -44,6 +52,18 @@ public class Lab_5 : MonoBehaviour
 	{
 		grid.origin = new Vector3((Screen.width / 2), (Screen.height / 2), 0);
 		grid.screenSize = new Vector3((Screen.width), (Screen.height), 0);
+
+		shipCenter = new Vector3(0, 0);
+
+		Vector3 p1, p2, p3 = new Vector3();
+
+		p1 = GridToScreen(new Vector3(shipCenter.x - 5f, shipCenter.y + 2f));
+		p2 = GridToScreen(new Vector3(shipCenter.x - 5f, shipCenter.y - 2f));
+		p3 = GridToScreen(new Vector3(shipCenter.x + 5f, shipCenter.y));
+
+		shipPoints[0] = p1;
+		shipPoints[1] = p2;
+		shipPoints[2] = p3;
 	}
 
 	private void Update()
@@ -64,7 +84,7 @@ public class Lab_5 : MonoBehaviour
 		#region Spaceship
 
 		ControlSpaceship();
-		DrawSpaceShip(new Vector3(0, 0), Color.cyan);
+		DrawSpaceShip(shipCenter, Color.cyan);
 
 		#endregion
 
@@ -138,25 +158,59 @@ public class Lab_5 : MonoBehaviour
 	{
 		spaceship.Lines.Clear();
 
-		Vector3 p1, p2, p3 = new Vector3();
+		shipPoints[0] = GridToScreen(new Vector3(shipCenter.x - 5f, shipCenter.y + 2f));
+		shipPoints[1] = GridToScreen(new Vector3(shipCenter.x - 5f, shipCenter.y - 2f));
+		shipPoints[2] = GridToScreen(new Vector3(shipCenter.x + 5f, shipCenter.y));
 
-		p1 = GridToScreen(new Vector3(center.x - 5f, center.y + 2f));
-		p2 = GridToScreen(new Vector3(center.x - 5f, center.y - 2f));
-		p3 = GridToScreen(new Vector3(center.x + 5f, center.y));
+		shipPoints[0] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotAngle, shipPoints[0]);
+		shipPoints[1] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotAngle, shipPoints[1]);
+		shipPoints[2] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotAngle, shipPoints[2]);
 
-		spaceship.Lines.Add(new Line(p1, p2, color));
-		spaceship.Lines.Add(new Line(p2, p3, color));
-		spaceship.Lines.Add(new Line(p3, p1, color));
+		spaceship.Lines.Add(new Line(shipPoints[0], shipPoints[1], color));
+		spaceship.Lines.Add(new Line(shipPoints[1], shipPoints[2], color));
+		spaceship.Lines.Add(new Line(shipPoints[2], shipPoints[0], color));
 
 		spaceship.Draw();
 	}
 
 	public void ControlSpaceship()
 	{
-		if (Input.GetKeyDown(KeyCode.W))
+		Vector3 force = Vector3.zero;
+
+		if (Input.GetKey(KeyCode.A))
 		{
-			shipVelocity += 1f;
+			shipPoints[0] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotSpeed, shipPoints[0]);
+			shipPoints[1] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotSpeed, shipPoints[1]);
+			shipPoints[2] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotSpeed, shipPoints[2]);
+
+			shipRotAngle += shipRotSpeed;
 		}
+
+		if (Input.GetKey(KeyCode.D))
+		{
+			shipPoints[0] = DrawingTools.RotatePoint(GridToScreen(shipCenter), -shipRotSpeed, shipPoints[0]);
+			shipPoints[1] = DrawingTools.RotatePoint(GridToScreen(shipCenter), -shipRotSpeed, shipPoints[1]);
+			shipPoints[2] = DrawingTools.RotatePoint(GridToScreen(shipCenter), -shipRotSpeed, shipPoints[2]);
+
+			shipRotAngle -= shipRotSpeed;
+		}
+
+		if(Input.GetKey(KeyCode.W))
+		{
+			force.y = shipMoveSpeed * Mathf.Sin(shipRotAngle * Mathf.Deg2Rad);
+			force.x = shipMoveSpeed * Mathf.Cos(shipRotAngle * Mathf.Deg2Rad);
+		}
+
+		Vector3 acc = force / shipMass;
+
+		testForce = acc;
+
+		if(shipVelocity.magnitude <= (shipMaxMoveSpeed * Time.deltaTime))
+		{
+			shipVelocity += acc * Time.deltaTime;
+		}
+
+		shipCenter += (shipVelocity);
 	}
 
 	#endregion

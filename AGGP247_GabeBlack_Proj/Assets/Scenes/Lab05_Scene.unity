@@ -362,6 +362,13 @@ MonoBehaviour:
   lineColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   divisionColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   point: {x: 0, y: 0, z: 0}
+  shipCenter: {x: 0, y: 0, z: 0}
+  shipVelocity: {x: 0, y: 0, z: 0}
+  testForce: {x: 0, y: 0, z: 0}
   isDrawingOrigin: 1
   isDrawingAxis: 1
-  shipVelocity: 0
+  shipRotSpeed: 0.5
+  shipRotAngle: 0
+  shipMoveSpeed: 10
+  shipMass: 300
+  shipMaxMoveSpeed: 100
