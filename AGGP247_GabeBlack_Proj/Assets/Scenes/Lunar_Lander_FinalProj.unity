@@ -662,13 +662,19 @@ MonoBehaviour:
   shipCenter: {x: 0, y: 0, z: 0}
   shipVelocity: {x: 0, y: 0, z: 0}
   testForce: {x: 0, y: 0, z: 0}
+  numGround: 47
+  groundStart: -96
+  groundVariation: 2
+  groundSegmentLength: 8
   shipRotSpeed: 0.25
   shipRotAngle: 0
-  shipMoveSpeed: 2.2
-  shipMass: 40
-  shipMaxMoveSpeed: 3
+  shipMoveSpeed: 1.6
+  shipMass: 200
+  shipMaxMoveSpeed: 6
   gravity: -1
-  fuel: 1000
+  fuel: 3000
+  ground: []
+  groundColor: []
 --- !u!4 &1685979138
 Transform:
   m_ObjectHideFlags: 0
