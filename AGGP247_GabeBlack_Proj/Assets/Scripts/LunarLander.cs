@@ -35,6 +35,10 @@ public class LunarLander : MonoBehaviour
 	public Vector3 shipVelocity;
 	public Vector3 testForce;
 
+	public float rotCheckZone = 5.0f;
+	public float maxXVel = 20.0f;
+	public float maxYVel = 50.0f;
+
 	public int numGround = 100;
 	public int groundStart = -100;
 	public int groundVariation = 1;
@@ -97,10 +101,10 @@ public class LunarLander : MonoBehaviour
 
 		Vector3 b1, b2, b3, b4 = new Vector3();
 
-		b1 = GridToScreen(new Vector3(shipCenter.x - 4f, shipCenter.y + 1.5f));
-		b2 = GridToScreen(new Vector3(shipCenter.x - 4f, shipCenter.y - 1.5f));
-		b3 = GridToScreen(new Vector3(shipCenter.x + 4f, shipCenter.y - 1.5f));
-		b4 = GridToScreen(new Vector3(shipCenter.x + 4f, shipCenter.y + 1.5f));
+		b1 = GridToScreen(new Vector3(shipCenter.x - 3.8f, shipCenter.y + 1.35f));
+		b2 = GridToScreen(new Vector3(shipCenter.x - 3.8f, shipCenter.y - 1.35f));
+		b3 = GridToScreen(new Vector3(shipCenter.x + 3.8f, shipCenter.y - 1.35f));
+		b4 = GridToScreen(new Vector3(shipCenter.x + 3.8f, shipCenter.y + 1.35f));
 
 		shipHB[0] = b1;
 		shipHB[1] = b2;
@@ -134,6 +138,11 @@ public class LunarLander : MonoBehaviour
 		yVelField.text = System.Math.Round(Y_VEL, 2).ToString();
 
 		DrawTerrain();
+
+		//for (int i = 0; i + 2 <= groundVect.Count; i += 2)
+		//{
+		//	DrawLine(new Line(GridToScreen(groundVect[i]), GridToScreen(groundVect[i + 2]), Color.blue));
+		//}
 	}
 
 	//Takes the potential grid space and outputs it into screen space
@@ -172,7 +181,7 @@ public class LunarLander : MonoBehaviour
 				groundVect.Add(new Vector3(start, sRandY));
 				groundVect.Add(new Vector3(end, eRandY));
 				groundColor.Add(axisColor);
-				groundColor.Add(axisColor);
+				//groundColor.Add(axisColor);
 				groundValid.Add(false);
 				groundValid.Add(false);
 
@@ -188,25 +197,49 @@ public class LunarLander : MonoBehaviour
 			}
 			else if(isSecond)
 			{
-				groundColor.Add(divisionColor);
-				groundColor.Add(divisionColor);
-				groundValid.Add(false);
-				groundValid.Add(true);
-
-				groundVect.Add(new Vector3(start, sRandY));
+				//groundVect.Add(new Vector3(start, sRandY));
 				groundVect.Add(new Vector3(end, eRandY));
+
+				groundColor.Add(divisionColor);
+				groundColor.Add(divisionColor);
+				groundValid.Add(true);
+				groundValid.Add(true);
 
 				start = end;
 				end = start + groundSegmentLength;
 
-				sRandY += Random.Range(-groundVariation, groundVariation);
-				eRandY += Random.Range(-groundVariation, groundVariation);
+				while(sRandY == eRandY)
+				{
+					sRandY += Random.Range(-groundVariation, groundVariation);
+					eRandY += Random.Range(-groundVariation, groundVariation);
+				}
 
 				isSecond = false;
 			}
 			else
 			{
-				if(sRandY == eRandY)
+				for (int i = 1; i < groundVect.Count; i++)
+				{
+					int rand = Random.Range(-groundVariation / 2, groundVariation);
+
+					if (sRandY == groundVect[i].y)
+					{
+						sRandY = sRandY + rand;
+					}
+
+					if (eRandY == groundVect[i].y)
+					{
+						eRandY = eRandY + rand;
+					}
+
+					if (groundVect[i] == groundVect[i - 1])
+					{
+						Debug.Log(i);
+						groundVect[i] = new Vector3(groundVect[i].x, groundVect[i].y + rand);
+					}
+				}
+
+				if (sRandY == eRandY)
 				{
 					groundVect.Add(new Vector3(start, sRandY));
 					groundVect.Add(new Vector3(end, eRandY));
@@ -253,6 +286,8 @@ public class LunarLander : MonoBehaviour
 	{
 		float totalArea = triArea(GridToScreen(triP1), GridToScreen(triP2), GridToScreen(triP3));
 
+		//Debug.Log(totalArea);
+
 		float area1 = triArea(GridToScreen(triP1), GridToScreen(triP2), testPoint);
 		float area2 = triArea(GridToScreen(triP2), GridToScreen(triP3), testPoint);
 		float area3 = triArea(GridToScreen(triP1), GridToScreen(triP3), testPoint);
@@ -266,11 +301,11 @@ public class LunarLander : MonoBehaviour
 		{
 			return true;
 		}
-		else if (sum == totalArea + 10)
+		else if (sum == totalArea + 100)
 		{
 			return true;
 		}
-		else if (sum == totalArea - 10)
+		else if (sum == totalArea - 100)
 		{
 			return true;
 		}
@@ -300,10 +335,10 @@ public class LunarLander : MonoBehaviour
 		shipPoints[5] = GridToScreen(new Vector3(shipCenter.x - 4f, shipCenter.y + 1.5f));
 		shipPoints[6] = GridToScreen(new Vector3(shipCenter.x - 4f, shipCenter.y - 1.5f));
 
-		shipHB[0] = GridToScreen(new Vector3(shipCenter.x - 4f, shipCenter.y + 1.5f));
-		shipHB[1] = GridToScreen(new Vector3(shipCenter.x - 4f, shipCenter.y - 1.5f));
-		shipHB[2] = GridToScreen(new Vector3(shipCenter.x + 4f, shipCenter.y - 1.5f));
-		shipHB[3] = GridToScreen(new Vector3(shipCenter.x + 4f, shipCenter.y + 1.5f));
+		shipHB[0] = GridToScreen(new Vector3(shipCenter.x - 3.8f, shipCenter.y + 1.35f));
+		shipHB[1] = GridToScreen(new Vector3(shipCenter.x - 3.8f, shipCenter.y - 1.35f));
+		shipHB[2] = GridToScreen(new Vector3(shipCenter.x + 3.8f, shipCenter.y - 1.35f));
+		shipHB[3] = GridToScreen(new Vector3(shipCenter.x + 3.8f, shipCenter.y + 1.35f));
 
 		shipPoints[0] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotAngle, shipPoints[0]);
 		shipPoints[1] = DrawingTools.RotatePoint(GridToScreen(shipCenter), shipRotAngle, shipPoints[1]);
@@ -334,7 +369,7 @@ public class LunarLander : MonoBehaviour
 		shipHitBox.Lines.Add(new Line(shipHB[3], shipHB[0], Color.red));
 
 		spaceship.Draw();
-		shipHitBox.Draw();
+		//shipHitBox.Draw();
 	}
 
 	public void ControlSpaceship()
@@ -393,6 +428,9 @@ public class LunarLander : MonoBehaviour
 
 	public void GroundCollision()
 	{
+		bool isSafe = false;
+		bool isCrash = false;
+
 		for(int i = 0; i < groundVect.Count; i+=2)
 		{
 			if(i >= 2)
@@ -400,22 +438,43 @@ public class LunarLander : MonoBehaviour
 				if((isInsideTri(groundVect[i], groundVect[i - 1], groundVect[i - 2], shipHB[0])) || (isInsideTri(groundVect[i], groundVect[i - 1], groundVect[i - 2], shipHB[1]))
 				   || (isInsideTri(groundVect[i], groundVect[i - 1], groundVect[i - 2], shipHB[2])) || (isInsideTri(groundVect[i], groundVect[i - 1], groundVect[i - 2], shipHB[3])))
 				{
-					shipVelocity = Vector3.zero;
-					canControl = false;
-					restartText.gameObject.SetActive(true);
+					float rot = shipRotAngle % 90;
 
-					Debug.Log(i);
+					Debug.Log(Mathf.Abs(rot));
 
-					if(groundColor[i] == divisionColor)
+					if (groundColor[i] == divisionColor && (Mathf.Abs(rot) <= 90 + rotCheckZone || Mathf.Abs(rot) >= 90 - rotCheckZone) && X_VEL >= -maxXVel && Y_VEL >= -maxYVel && X_VEL <= maxXVel && Y_VEL <= maxYVel)
 					{
 						Debug.Log("Safe Landing Area");
+						isSafe = true;
 					}
 					else
 					{
 						Debug.Log("Crash");
+						isCrash = true;
 					}
 
-					if(Input.GetKeyDown(KeyCode.Space))
+					if(isSafe)
+					{
+						restartText.text = "You made a safe landing!!\nPress 'Space' to go again!\nPress 'Q' to go quit";
+					}
+
+					if(isCrash)
+					{
+						restartText.text = "You crashed...\nPress 'Space' to go again!\nPress 'Q' to go quit";
+					}
+
+					shipVelocity = Vector3.zero;
+					canControl = false;
+					restartText.gameObject.SetActive(true);
+
+					if (Input.GetKeyDown(KeyCode.Space))
+					{
+						canControl = true;
+						restartText.gameObject.SetActive(false);
+						SceneManager.LoadScene(2);
+					}
+
+					if (Input.GetKeyDown(KeyCode.Q))
 					{
 						canControl = true;
 						restartText.gameObject.SetActive(false);
